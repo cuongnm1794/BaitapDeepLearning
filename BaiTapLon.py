@@ -6,9 +6,10 @@ import time
 import numpy as np
 from sklearn.preprocessing import Binarizer
 import itertools
-from matplotlib import pyplot as plt
+import matplotlib.pyplot as plt
+from IPython.display import Image, display
 
-import bai1_downloadFile
+#import bai1_downloadFile
 import bai2_readFile
 import bai3_chuanhoa
 
@@ -47,9 +48,9 @@ def Bai2_ReadData_Mul(label):
 
     pool = mp.Pool(mp.cpu_count() - 1 )
     result_mul = [  pool.apply_async(bai2_readFile.ReadImageData,args=(os.path.join(path_dataset,label,row),)).get() for row in tqdm(images,desc='Read data '+label) ]
+    result_mul = [x for x in result_mul if x] 
     pool.close()
     pool.join()
-    result = []
     return [result_mul,label]
 
 def Bai3_ChuanHoa(data_input):
@@ -87,12 +88,13 @@ def Bai4_Xuly(data_input):
     """
 
     #Lấy chiều cao và rộng
-    list_width = [x[0] for x in data_input[0] ]
+    list_width = np.array([x[0] for x in data_input[0] ])
     list_height = [x[1] for x in data_input[0] ]
-
-    #print("Number of label: {}".format(len(data_input[0])))
+    
+    print("Number of label: {}".format(len(data_input[0])))
+    
     fig, axes = plt.subplots(nrows=1, ncols=2)
-    fig.suptitle('Hist of {} ({})'.format(data_input[1],len(data_input[0])), fontsize=16)
+    fig.suptitle('Hist of {} ({})'.format(data_input[1],len(data_input[0])), fontsize=12)
     ax0, ax1 = axes.flatten()
     ax0.hist(list_width)
     ax0.set_title('Hist width: '+data_input[1])
@@ -100,12 +102,15 @@ def Bai4_Xuly(data_input):
     ax1.hist(list_height)
     ax1.set_title('Hist height: '+data_input[1])
     fig.tight_layout()
-    plt.show()
+    plt.savefig("pyplot_"+data_input[1]+".png")
+    display(Image(filename="pyplot_"+data_input[1]+".png"))
 
 if __name__ == "__main__":
     # ====> Bài 1
     #
     #Bai1_Download(label_list)
+
+
     for label in label_list:
         # ====> Bài 2
         result_bai2 = Bai2_ReadData_Mul(label)
